@@ -21,7 +21,7 @@
     "sqlite3": "^5.0.1"
   },
   "scripts": {
-    "test": "jest",
+    "test": "jest --detectOpenHandles --forceExit",
     "migrate": "knex migrate:latest",
     "rollback": "knex migrate:rollback",
     "seed": "knex seed:run",
