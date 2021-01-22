@@ -18,5 +18,23 @@ class UserController {
       res.sendStatus(500);
     }
   }
+
+  async getAllUsers(req, res) {
+    const users = await User.findAll();
+
+    return res.status(200).json(users);
+  }
+
+  async getUserById(req, res) {
+    const id = req.params.id;
+
+    if (isNaN(id)) return res.sendStatus(400);
+
+    const user = await User.findById(id);
+
+    if (!user) return res.sendStatus(404);
+
+    return res.status(200).json(user);
+  }
 }
 module.exports = new UserController();

@@ -13,6 +13,21 @@ class User {
     }
     return false;
   }
+
+  async findAll() {
+    const users = await db("users").select("email", "id", "role", "name");
+
+    return users;
+  }
+
+  async findById(id) {
+    const user = await db("users")
+      .select("email", "id", "role", "name")
+      .where({ id })
+      .first();
+
+    return user;
+  }
 }
 
 module.exports = new User();
