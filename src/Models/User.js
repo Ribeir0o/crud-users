@@ -28,6 +28,10 @@ class User {
 
     return user;
   }
+
+  async editUser(data, id) {
+    await db("users").update(data).where({ id });
+  }
 }
 
 module.exports = new User();

@@ -8,7 +8,7 @@ exports.up = function (knex) {
 
     table.string("password");
 
-    table.integer("role");
+    table.integer("role").defaultTo(0);
 
     table.timestamps(true, true);
   });
