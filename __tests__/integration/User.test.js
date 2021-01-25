@@ -1,15 +1,14 @@
 const request = require("supertest");
 const app = require("../../src/app");
-
 const firstUser = require("../../src/constants/user");
 
 describe("POST /user", () => {
   it("Should return 400 if neither email, nor password nor name were sent ", async (done) => {
-    const data = {
+    const payload = {
       email: "test@testing.com",
     };
 
-    await request(app).post("/user").send(data).expect(400);
+    await request(app).post("/user").send(payload).expect(400);
     done();
   });
 
@@ -23,14 +22,14 @@ describe("POST /user", () => {
     done();
   });
 
-  it("Should return 201 if the data was sent correctly", async (done) => {
-    const data = {
+  it("Should return 201 if the payload was sent correctly", async (done) => {
+    const payload = {
       name: "thiago",
-      email: "thiago@email.com",
+      email: "thiagogr71@gmail.com",
       password: "strongpassword123",
     };
 
-    await request(app).post("/user").send(data).expect(201);
+    await request(app).post("/user").send(payload).expect(201);
     done();
   });
 });
@@ -72,7 +71,7 @@ describe("PUT /user/:id", () => {
     done();
   });
 
-  it("Should return 400 if no data is sent and user exists", async (done) => {
+  it("Should return 400 if no payload is sent and user exists", async (done) => {
     await request(app).put("/user/1").expect(400);
     done();
   });
@@ -109,6 +108,31 @@ describe("DELETE /user/:id", () => {
 
   it("Should return 400 if the id is NaN", async (done) => {
     await request(app).delete("/user/abc").expect(400);
+    done();
+  });
+});
+
+describe("POST /user/recovery", () => {
+  it("Should return 404 if the email doesn't exist in the db", async (done) => {
+    const payload = {
+      email: "idont@exist.com",
+    };
+
+    await request(app).post("/user/recovery").send(payload).expect(404);
+    done();
+  });
+
+  it("Should return 400 if the email was not sent", async (done) => {
+    await request(app).post("/user/recovery").expect(400);
+    done();
+  });
+
+  it("Should return 201 if the email exists", async (done) => {
+    const payload = {
+      email: "thiagogr71@gmail.com",
+    };
+
+    await request(app).post("/user/recovery").send(payload).expect(201);
     done();
   });
 });

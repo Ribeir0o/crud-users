@@ -1,3 +1,5 @@
+const { sendMail } = require("../lib/nodemailer");
+const PasswordToken = require("../Models/PasswordToken");
 const User = require("../Models/User");
 
 class UserController {
@@ -65,6 +67,21 @@ class UserController {
       const code = await User.deleteUser(id);
       return res.sendStatus(code);
     } catch (e) {
+      return res.sendStatus(500);
+    }
+  }
+
+  async postRecoverPassword(req, res) {
+    const { email } = req.body;
+
+    if (!email) return res.sendStatus(400);
+    try {
+      const { code, token } = await PasswordToken.generateToken(email);
+      if (!token) return res.sendStatus(code);
+      sendMail(email, token);
+      res.sendStatus(code);
+    } catch (e) {
+      console.error(e);
       return res.sendStatus(500);
     }
   }

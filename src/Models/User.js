@@ -18,6 +18,13 @@ class User {
     return users;
   }
 
+  async findByEmail(email) {
+    const user = await db("users")
+      .select("email", "id", "role", "name")
+      .where({ email })
+      .first();
+    return user;
+  }
   async findById(id) {
     const user = await db("users")
       .select("email", "id", "role", "name")
