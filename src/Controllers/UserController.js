@@ -2,6 +2,7 @@ const { sendMail } = require("../lib/nodemailer");
 const PasswordToken = require("../Models/PasswordToken");
 const User = require("../Models/User");
 const bcrypt = require("bcryptjs");
+
 class UserController {
   async postUser(req, res) {
     const { email, name, password } = req.body;
@@ -85,6 +86,22 @@ class UserController {
       console.error(e);
       return res.sendStatus(500);
     }
+  }
+
+  async postChangePassword(req, res) {
+    const { id } = req.params;
+    const { password, token } = req.body;
+    if (!id || !password || !token) return res.sendStatus(400);
+
+    const isValid = await PasswordToken.validateToken(token, id);
+
+    if (isValid) {
+      const hash = await bcrypt.hash(password, 10);
+      await User.redefinePassword(hash, id);
+      await PasswordToken.setUsed(token);
+      return res.sendStatus(200);
+    }
+    res.sendStatus(400);
   }
 }
 module.exports = new UserController();

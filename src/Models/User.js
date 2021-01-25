@@ -56,6 +56,10 @@ class User {
     HTTP_CODE = 404;
     return HTTP_CODE;
   }
+
+  async redefinePassword(password, id) {
+    await db("users").update({ password }).where({ id });
+  }
 }
 
 module.exports = new User();

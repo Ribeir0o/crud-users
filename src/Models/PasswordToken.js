@@ -16,6 +16,22 @@ class PasswordToken {
     }
     return { code: 404 };
   }
+
+  async validateToken(token, id) {
+    const token_stats = await db("passwordTokens")
+      .select()
+      .where({ token })
+      .first();
+
+    if (!token_stats || token_stats.used || token_stats.user_id != id) {
+      return false;
+    }
+    return true;
+  }
+
+  async setUsed(token) {
+    await db("passwordTokens").update({ used: true }).where({ token });
+  }
 }
 
 module.exports = new PasswordToken();

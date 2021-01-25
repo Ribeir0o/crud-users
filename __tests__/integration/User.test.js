@@ -1,6 +1,8 @@
 const request = require("supertest");
 const app = require("../../src/app");
 const firstUser = require("../../src/constants/user");
+const PasswordToken = require("../../src/Models/PasswordToken");
+const User = require("../../src/Models/User");
 
 describe("POST /user", () => {
   it("Should return 400 if neither email, nor password nor name were sent ", async (done) => {
@@ -133,6 +135,40 @@ describe("POST /user/recovery", () => {
     };
 
     await request(app).post("/user/recovery").send(payload).expect(201);
+    done();
+  });
+});
+
+describe("POST /user/recovery/:id", () => {
+  it("Should return 400 if an invalid token is sent", async (done) => {
+    const payload = {
+      password: "newPassword",
+      token: "invalid",
+    };
+
+    await request(app).post("/user/recovery/4").send(payload).expect(400);
+    done();
+  });
+
+  it("Should return 400 if a field is empty", async (done) => {
+    const payload = {
+      password: "newpassword",
+    };
+
+    await request(app).post("/user/recovery/4").send(payload).expect(400);
+    done();
+  });
+
+  it("Should return 200 if the token is valid", async (done) => {
+    const user = await User.findAll();
+    const { email, id } = user[0];
+    const { token } = await PasswordToken.generateToken(email);
+    const payload = {
+      password: "StrongestPassword",
+      token,
+    };
+
+    await request(app).post(`/user/recovery/${id}`).send(payload).expect(200);
     done();
   });
 });
