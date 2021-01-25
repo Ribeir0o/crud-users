@@ -7,7 +7,6 @@ class User {
 
   async checkIfEmailIsRegistered(email) {
     const data = await db("users").select().where({ email }).first();
-
     if (data) {
       return true;
     }
@@ -16,7 +15,6 @@ class User {
 
   async findAll() {
     const users = await db("users").select("email", "id", "role", "name");
-
     return users;
   }
 
@@ -25,12 +23,31 @@ class User {
       .select("email", "id", "role", "name")
       .where({ id })
       .first();
-
     return user;
   }
 
   async editUser(data, id) {
-    await db("users").update(data).where({ id });
+    const user = await this.findById(id);
+    let HTTP_CODE;
+    if (user) {
+      await db("users").update(data).where({ id });
+      HTTP_CODE = 200;
+      return HTTP_CODE;
+    }
+    HTTP_CODE = 404;
+    return HTTP_CODE;
+  }
+
+  async deleteUser(id) {
+    const user = await this.findById(id);
+    let HTTP_CODE;
+    if (user) {
+      await db("users").where({ id }).delete();
+      HTTP_CODE = 200;
+      return HTTP_CODE;
+    }
+    HTTP_CODE = 404;
+    return HTTP_CODE;
   }
 }
 

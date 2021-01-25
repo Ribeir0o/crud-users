@@ -10,7 +10,6 @@ describe("POST /user", () => {
     };
 
     await request(app).post("/user").send(data).expect(400);
-
     done();
   });
 
@@ -21,7 +20,6 @@ describe("POST /user", () => {
       .post("/user")
       .send({ email, password, name })
       .expect(422);
-
     done();
   });
 
@@ -33,7 +31,6 @@ describe("POST /user", () => {
     };
 
     await request(app).post("/user").send(data).expect(201);
-
     done();
   });
 });
@@ -43,11 +40,8 @@ describe("GET /user", () => {
     const { email, name, role, id } = firstUser;
 
     const res = await request(app).get("/user").expect(200);
-
     expect(res.body).toBeInstanceOf(Array);
-
     expect(res.body[0]).toStrictEqual({ email, name, role, id });
-
     done();
   });
 });
@@ -57,21 +51,17 @@ describe("GET /user/:id", () => {
     const { email, role, name, id } = firstUser;
 
     const res = await request(app).get("/user/1").expect(200);
-
     expect(res.body).toStrictEqual({ email, name, id, role });
-
     done();
   });
 
   it("Should return 400 if the id is NaN", async (done) => {
     await request(app).get("/user/string").expect(400);
-
     done();
   });
 
   it("Should return 404 if the user doesn't exist", async (done) => {
     await request(app).get("/user/35").expect(404);
-
     done();
   });
 });
@@ -79,29 +69,46 @@ describe("GET /user/:id", () => {
 describe("PUT /user/:id", () => {
   it("Should return 400 if the id is NaN", async (done) => {
     await request(app).put("/user/asdad").expect(400);
-
     done();
   });
 
   it("Should return 400 if no data is sent and user exists", async (done) => {
     await request(app).put("/user/1").expect(400);
-
     done();
   });
 
   it("Should return 404 if the user doesn't exist", async (done) => {
-    await request(app).put("/user/32").expect(404);
+    const payload = {
+      email: "mymail@myemail.com",
+    };
 
+    await request(app).put("/user/32").send(payload).expect(404);
     done();
   });
 
-  it("Should return 204 if user exists and payload is provided", async (done) => {
+  it("Should return 200 if user exists and payload is provided", async (done) => {
     const payload = {
       email: "novoemail@email.com",
     };
 
-    await request(app).put("/user/1").send(payload).expect(204);
+    await request(app).put("/user/1").send(payload).expect(200);
+    done();
+  });
+});
 
+describe("DELETE /user/:id", () => {
+  it("Should 404 if the user doesn't exist", async (done) => {
+    await request(app).delete("/user/32").expect(404);
+    done();
+  });
+
+  it("Should return 200 if the user was deleted", async (done) => {
+    await request(app).delete("/user/1").expect(200);
+    done();
+  });
+
+  it("Should return 400 if the id is NaN", async (done) => {
+    await request(app).delete("/user/abc").expect(400);
     done();
   });
 });
