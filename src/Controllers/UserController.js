@@ -1,7 +1,7 @@
 const { sendMail } = require("../lib/nodemailer");
 const PasswordToken = require("../Models/PasswordToken");
 const User = require("../Models/User");
-
+const bcrypt = require("bcryptjs");
 class UserController {
   async postUser(req, res) {
     const { email, name, password } = req.body;
@@ -12,7 +12,8 @@ class UserController {
     if (isRegistered) return res.sendStatus(422);
 
     try {
-      await User.create({ email, name, password });
+      const hash = await bcrypt.hash(password, 10);
+      await User.create({ email, name, password: hash });
       res.sendStatus(201);
     } catch (e) {
       res.sendStatus(500);
