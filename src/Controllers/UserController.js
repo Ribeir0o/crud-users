@@ -2,6 +2,7 @@ const { sendMail } = require("../lib/nodemailer");
 const PasswordToken = require("../Models/PasswordToken");
 const User = require("../Models/User");
 const bcrypt = require("bcryptjs");
+const jwt = require("../lib/jwt");
 
 class UserController {
   async postUser(req, res) {
@@ -102,6 +103,20 @@ class UserController {
       return res.sendStatus(200);
     }
     res.sendStatus(400);
+  }
+
+  async postLogin(req, res) {
+    const { email, password } = req.body;
+    if (!email || !password) return res.sendStatus(400);
+
+    const user = await User.findByEmail(email);
+    if (!user) return res.sendStatus(404);
+
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) return res.sendStatus(401);
+
+    const token = await jwt.sign({ email: user.email, role: user.role });
+    return res.status(200).json({ token });
   }
 }
 module.exports = new UserController();

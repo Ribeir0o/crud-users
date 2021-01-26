@@ -20,7 +20,7 @@ class User {
 
   async findByEmail(email) {
     const user = await db("users")
-      .select("email", "id", "role", "name")
+      .select("email", "id", "password", "role", "name")
       .where({ email })
       .first();
     return user;
